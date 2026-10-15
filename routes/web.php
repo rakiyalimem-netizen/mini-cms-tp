@@ -31,3 +31,11 @@ Route::get('/heure', function () {
     ]);
 });
 
+Route::get('/a-propos', function () {
+    return view('a-propos', [
+        'auteur' => 'Rakia Limem',
+        'groupe' => 'MDW32',
+    ]);
+});
+
+
