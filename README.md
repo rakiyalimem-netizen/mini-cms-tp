@@ -7,14 +7,13 @@ Auteur : Rakia Limem, groupe MDW32.
 
 Mini-CMS évoluera au fil du semestre vers une petite plateforme de publication : pages publiques, back-office authentifié, API JSON et tests Pest. Chaque session se termine par un tag Git (`lab-01`, `lab-01b`, puis un tag par session).
 
-## État actuel (tag lab-02)
 
-- Routes nommées, toutes servies par des contrôleurs : `PageController` pour les pages et `PostController` pour les articles.
-- Articles stockés dans un tableau PHP, sans base de données pour l'instant.
-- Layout Blade `<x-layout>` avec Tailwind chargé par Vite.
-- Composant Blade avec `$slot` et le slot nommé `title`.
-- Routes avec paramètres, contraintes `where` et `whereNumber`, préfixes et noms regroupés.
-- Base de données SQLite locale (`database/database.sqlite`, non versionnée).
+## État actuel (tag lab-02b)
+
+- Pages construites avec des composants Blade anonymes : `x-navbar`, `x-nav-link`, `x-post-card`, `x-alert`, `x-page-header`.
+- Lien actif dans la navigation avec `request()->routeIs()`.
+- Articles toujours stockés dans un tableau PHP, sans base de données pour l'instant.
+
 
 ## Routes disponibles
 
@@ -65,16 +64,46 @@ composer run dev
 
 Ouvrir ensuite http://localhost:8000 (adresse de l'application, différente de l'adresse de Vite sur le port 5173).
 
+
 ## Captures d'écran
 
-### Accueil avec le layout
+### Session 03
+
+#### Accueil avec le layout
 
 ![Page d'accueil avec le layout](screenshots/s03-accueil.png)
 
-### Liste des articles
+#### Liste des articles
 
 ![Liste des articles](screenshots/s03-articles.png)
 
-### Détail d'un article
+#### Détail d'un article
 
 ![Détail d'un article](screenshots/s03-article.png)
+
+### Session 04
+
+#### Accueil
+
+![Accueil](screenshots/s04-accueil.png)
+
+#### À propos
+
+![À propos](screenshots/s04-a-propos.png)
+
+#### Heure
+
+![Heure](screenshots/s04-heure.png)
+
+#### Liste des articles
+
+![Liste des articles](screenshots/s04-articles.png)
+
+#### Détail d'un article
+
+![Détail d'un article](screenshots/s04-detail-article.png)
+
+#### Archive 2025
+
+![Archive 2025](screenshots/s04-archive-2025.png)
+
