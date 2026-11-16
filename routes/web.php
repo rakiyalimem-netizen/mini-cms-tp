@@ -8,5 +8,4 @@ Route::get('/', [PageController::class, 'home'])->name('home');
 Route::get('/a-propos', [PageController::class, 'about'])->name('about');
 Route::get('/heure', [PageController::class, 'time'])->name('time');
 
-Route::resource('posts', PostController::class)
-    ->only(['index', 'show', 'create', 'store', 'edit', 'update']);
+Route::resource('posts', PostController::class)->only(['index', 'show', 'create', 'store', 'edit', 'update']);

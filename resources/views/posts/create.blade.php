@@ -1,28 +1,13 @@
-<?php
+<x-layout>
+    <x-slot:title>Nouvel article - Mini-CMS</x-slot:title>
 
-use Illuminate\Database\Migrations\Migration;
-use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
+    <x-page-header title="Nouvel article" subtitle="Chaque champ est vérifié par le serveur." />
 
-return new class extends Migration
-{
-    /**
-     * Run the migrations.
-     */
-    public function up(): void
-    {
-        Schema::table('posts', function (Blueprint $table) {
-            $table->string('excerpt')->nullable();
-        });
-    }
+    @if ($errors->any())
+        <x-alert type="error" title="Le formulaire contient des erreurs" class="mb-6 max-w-2xl">
+            Corrigez les champs signalés, puis envoyez à nouveau.
+        </x-alert>
+    @endif
 
-    /**
-     * Reverse the migrations.
-     */
-    public function down(): void
-    {
-        Schema::table('posts', function (Blueprint $table) {
-            $table->dropColumn('excerpt');
-        });
-    }
-};
+    <x-post-form />
+</x-layout>
