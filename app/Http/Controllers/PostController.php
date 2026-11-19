@@ -1,39 +1,86 @@
-<x-layout>
-    <x-slot:title>{{ $post->title }} - Mini-CMS</x-slot:title>
+<?php
 
-    <article class="max-w-2xl">
-        <a href="{{ route('posts.index') }}" class="text-sm text-indigo-600 hover:underline">Retour aux articles</a>
+namespace App\Http\Controllers;
 
-        <h1 class="text-3xl font-bold mt-4 mb-2">{{ $post->title }}</h1>
+use App\Models\Post;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
+use Illuminate\View\View;
 
-        <p class="text-sm text-gray-500 mb-6">
-            @if ($post->published_at)
-                Publié le {{ $post->published_at->format('d/m/Y') }}
-            @else
-                Brouillon
-            @endif
-        </p>
+class PostController extends Controller
+{
+    public function index(): View
+    {
+        return view('posts.index', [
+            'heading' => 'Tous les articles',
+            'posts' => Post::latest('id')->paginate(4),
+        ]);
+    }
 
-        @if ($post->excerpt)
-            <p class="text-lg text-gray-600 mb-6">{{ $post->excerpt }}</p>
-        @endif
+    public function archive(string $year): View
+    {
+        return view('posts.index', [
+            'heading' => 'Articles de '.$year,
+            'posts' => Post::published()->whereYear('published_at', $year)->latest('id')->paginate(4),
+        ]);
+    }
 
-        <div class="text-gray-800 leading-relaxed whitespace-pre-line">{{ $post->body }}</div>
+    public function create(): View
+    {
+        return view('posts.create');
+    }
 
-        <div class="mt-8 flex flex-wrap items-start gap-4">
-            <a href="{{ route('posts.edit', $post) }}" class="rounded-md border border-indigo-600 px-4 py-2 text-sm font-medium text-indigo-600 hover:bg-indigo-50">Modifier</a>
+    public function store(Request $request): RedirectResponse
+    {
+        $validated = $request->validate([
+            'title' => ['required', 'string', 'max:255'],
+            'slug' => ['required', 'string', 'max:255', 'regex:/^[a-z0-9-]+$/', 'unique:posts,slug'],
+            'excerpt' => ['nullable', 'string', 'max:255'],
+            'body' => ['required', 'string', 'min:20'],
+            'is_published' => ['nullable', 'boolean'],
+        ]);
 
-            <details>
-                <summary class="cursor-pointer rounded-md border border-red-600 px-4 py-2 text-sm font-medium text-red-700 hover:bg-red-50">Supprimer</summary>
+        $validated['is_published'] = $request->boolean('is_published');
+        $validated['published_at'] = $validated['is_published'] ? now() : null;
 
-                <form method="POST" action="{{ route('posts.destroy', $post) }}" class="mt-3 rounded-md border border-red-200 bg-red-50 p-4">
-                    @csrf
-                    @method('DELETE')
+        $post = Post::create($validated);
 
-                    <p class="mb-3 text-sm text-red-900">Cette action est définitive : l'article sera effacé de la base.</p>
-                    <button type="submit" class="rounded-md bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700">Confirmer la suppression</button>
-                </form>
-            </details>
-        </div>
-    </article>
-</x-layout>
+        return redirect()->route('posts.show', $post);
+    }
+
+    public function show(Post $post): View
+    {
+        return view('posts.show', compact('post'));
+    }
+
+    public function edit(Post $post): View
+    {
+        return view('posts.edit', compact('post'));
+    }
+
+    public function update(Request $request, Post $post): RedirectResponse
+    {
+        $validated = $request->validate([
+            'title' => ['required', 'string', 'max:255'],
+            'slug' => ['required', 'string', 'max:255', 'regex:/^[a-z0-9-]+$/', Rule::unique('posts', 'slug')->ignore($post)],
+            'excerpt' => ['nullable', 'string', 'max:255'],
+            'body' => ['required', 'string', 'min:20'],
+            'is_published' => ['nullable', 'boolean'],
+        ]);
+
+        $validated['is_published'] = $request->boolean('is_published');
+        $validated['published_at'] = $validated['is_published'] ? ($post->published_at ?? now()) : null;
+
+        $post->update($validated);
+
+        return redirect()->route('posts.show', $post);
+    }
+
+    public function destroy(Post $post): RedirectResponse
+    {
+        $post->delete();
+
+        return redirect()->route('posts.index');
+    }
+}
