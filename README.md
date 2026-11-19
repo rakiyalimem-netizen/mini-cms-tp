@@ -1,20 +1,9 @@
+## État actuel (tag lab-03b)
 
-# Mini-CMS
-
-Projet fil rouge de l'Atelier Framework Côté Serveur (Laravel 13, PHP 8.3+), 3e année MDW, ISET Sidi Bouzid.
-
-Auteur : Rakia Limem, groupe MDW32.
-
-Mini-CMS évoluera au fil du semestre vers une petite plateforme de publication : pages publiques, back-office authentifié, API JSON et tests Pest. Chaque session se termine par un tag Git (`lab-01`, `lab-01b`, puis un tag par session).
-
-
-## État actuel (tag lab-03)
-
-- Articles enregistrés dans une base SQLite et lus avec le modèle Eloquent `Post`.
-- Table `posts` créée par une migration : après un clone, `php artisan migrate` la recrée (vide).
-- Liste paginée, détail par liaison modèle-route, formulaire de création avec validation côté serveur.
-- Page d'accueil affichant les trois derniers articles publiés.
-- Tests automatisés Pest : `php artisan test` (8 tests réussis).
+- CRUD complet des articles : liste, détail, création, modification, suppression avec confirmation.
+- Colonne `excerpt` ajoutée par une nouvelle migration.
+- Scope `published` utilisé sur l'accueil et l'archive.
+- Tests Pest des lectures (`PostPagesTest`) et des écritures (`PostWriteTest`) : `php artisan test`.
 
 ## Routes disponibles
 
@@ -28,84 +17,7 @@ Mini-CMS évoluera au fil du semestre vers une petite plateforme de publication 
 | GET | `/posts/create` | `posts.create` | `PostController@create` |
 | POST | `/posts` | `posts.store` | `PostController@store` |
 | GET | `/posts/{post}` | `posts.show` | `PostController@show` |
-## Prérequis
-
-- PHP et Composer (PHP 8.3 ou plus, avec les extensions curl, fileinfo, mbstring, openssl, pdo_sqlite, sqlite3 et zip activées dans `php.ini`).
-- Node.js LTS et npm.
-- Git.
-
-## Installation
-
-### Bash (Git Bash, macOS, Linux)
-
-```bash
-git clone https://github.com/rakiyalimem-netizen/mini-cms-tp.git
-cd mini-cms-tp
-composer install
-npm install
-cp .env.example .env
-php artisan key:generate
-touch database/database.sqlite
-php artisan migrate
-composer run dev
-```
-
-### PowerShell (Windows)
-
-```powershell
-git clone https://github.com/rakiyalimem-netizen/mini-cms-tp.git
-cd mini-cms-tp
-composer install
-npm install
-copy .env.example .env
-php artisan key:generate
-New-Item database\database.sqlite -ItemType File
-php artisan migrate
-composer run dev
-```
-
-Ouvrir ensuite http://localhost:8000 (adresse de l'application, différente de l'adresse de Vite sur le port 5173).
-
-
-## Captures d'écran
-
-### Session 03
-
-#### Accueil avec le layout
-
-![Page d'accueil avec le layout](screenshots/s03-accueil.png)
-
-#### Liste des articles
-
-![Liste des articles](screenshots/s03-articles.png)
-
-#### Détail d'un article
-
-![Détail d'un article](screenshots/s03-article.png)
-
-### Session 04
-
-#### Accueil
-
-![Accueil](screenshots/s04-accueil.png)
-
-#### À propos
-
-![À propos](screenshots/s04-a-propos.png)
-
-#### Heure
-
-![Heure](screenshots/s04-heure.png)
-
-#### Liste des articles
-
-![Liste des articles](screenshots/s04-articles.png)
-
-#### Détail d'un article
-
-![Détail d'un article](screenshots/s04-detail-article.png)
-
-#### Archive 2025
-
-![Archive 2025](screenshots/s04-archive-2025.png)
-
+| GET | `/posts/{post}/edit` | `posts.edit` | `PostController@edit` |
+| PUT | `/posts/{post}` | `posts.update` | `PostController@update` |
+| DELETE | `/posts/{post}` | `posts.destroy` | `PostController@destroy` |
+| PATCH | `/posts/{post}/publication` | `posts.publication` | `PostController@togglePublication` |
