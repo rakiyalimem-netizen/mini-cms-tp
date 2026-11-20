@@ -115,12 +115,14 @@ class PostController extends Controller
         return redirect()->route('posts.show', $post)->with('success', 'Article mis à jour.');
     }
 
-    public function destroy(Post $post): RedirectResponse
-    {
-        $post->delete();
+  public function destroy(Post $post): RedirectResponse
+{
+    $post->tags()->detach();
 
-        return redirect()->route('posts.index')->with('success', 'Article supprimé.');
-    }
+    $post->delete();
+
+    return redirect()->route('posts.index')->with('success', 'Article supprimé.');
+}
 
     public function togglePublication(Post $post): RedirectResponse
     {
