@@ -68,7 +68,7 @@ class PostController extends Controller
         $validated['is_published'] = $request->boolean('is_published');
         $validated['published_at'] = $validated['is_published'] ? now() : null;
 
-        $post = Post::create(Arr::except($validated, ['tags']));
+        $post = $request->user()->posts()->create(Arr::except($validated, ['tags']));
         $post->tags()->sync($validated['tags'] ?? []);
 
         return redirect()->route('posts.show', $post)->with('success', 'Article créé.');
@@ -115,14 +115,12 @@ class PostController extends Controller
         return redirect()->route('posts.show', $post)->with('success', 'Article mis à jour.');
     }
 
-  public function destroy(Post $post): RedirectResponse
-{
-    $post->tags()->detach();
+    public function destroy(Post $post): RedirectResponse
+    {
+        $post->delete();
 
-    $post->delete();
-
-    return redirect()->route('posts.index')->with('success', 'Article supprimé.');
-}
+        return redirect()->route('posts.index')->with('success', 'Article supprimé.');
+    }
 
     public function togglePublication(Post $post): RedirectResponse
     {
