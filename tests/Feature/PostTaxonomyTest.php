@@ -37,12 +37,22 @@ it('replaces the tags on update with sync', function () {
     [$old, $kept, $new] = Tag::factory(3)->create()->all();
     $post->tags()->attach([$old->id, $kept->id]);
 
-    $this->put(route('posts.update', $post), taxonomyPostData(['tags' => [$kept->id, $new->id]]))
-        ->assertRedirect(route('posts.show', $post));
+    $this->put(route('posts.update', $post), taxonomyPostData([
+        'tags' => [$kept->id, $new->id],
+    ]))->assertRedirect(route('posts.show', $post));
 
-    $this->assertDatabaseMissing('post_tag', ['post_id' => $post->id, 'tag_id' => $old->id]);
-    $this->assertDatabaseHas('post_tag', ['post_id' => $post->id, 'tag_id' => $kept->id]);
-    $this->assertDatabaseHas('post_tag', ['post_id' => $post->id, 'tag_id' => $new->id]);
+    $this->assertDatabaseMissing('post_tag', [
+        'post_id' => $post->id,
+        'tag_id' => $old->id,
+    ]);
+    $this->assertDatabaseHas('post_tag', [
+        'post_id' => $post->id,
+        'tag_id' => $kept->id,
+    ]);
+    $this->assertDatabaseHas('post_tag', [
+        'post_id' => $post->id,
+        'tag_id' => $new->id,
+    ]);
 });
 
 it('removes every tag when no box is checked', function () {
@@ -56,16 +66,29 @@ it('removes every tag when no box is checked', function () {
 });
 
 it('refuses a category that does not exist', function () {
-    $this->post(route('posts.store'), taxonomyPostData(['category_id' => 999]))
-        ->assertRedirect();
+    $this->post(route('posts.store'), taxonomyPostData([
+        'category_id' => 999,
+    ]))->assertRedirect();
 
     $this->assertDatabaseMissing('posts', ['slug' => 'article-classe']);
 });
 
 it('lists the published posts of a category by its slug', function () {
-    $category = Category::factory()->create(['name' => 'Tutoriels', 'slug' => 'tutoriels']);
-    Post::factory()->published()->create(['category_id' => $category->id, 'title' => 'Dans la categorie']);
-    Post::factory()->create(['category_id' => $category->id, 'title' => 'Brouillon de la categorie']);
+    $category = Category::factory()->create([
+        'name' => 'Tutoriels',
+        'slug' => 'tutoriels',
+    ]);
+
+    Post::factory()->published()->create([
+        'category_id' => $category->id,
+        'title' => 'Dans la categorie',
+    ]);
+
+    Post::factory()->create([
+        'category_id' => $category->id,
+        'title' => 'Brouillon de la categorie',
+    ]);
+
     Post::factory()->published()->create(['title' => 'Hors categorie']);
 
     $this->get('/posts/categorie/tutoriels')
@@ -81,10 +104,60 @@ it('returns 404 for an unknown category slug', function () {
 
 it('counts the published posts of each category on the home page', function () {
     $category = Category::factory()->create(['name' => 'Tutoriels']);
-    Post::factory(2)->published()->create(['category_id' => $category->id]);
+
+    Post::factory(2)->published()->create([
+        'category_id' => $category->id,
+    ]);
+
     Post::factory()->create(['category_id' => $category->id]);
 
     $this->get(route('home'))
         ->assertOk()
         ->assertSee('Tutoriels (2)');
+});
+
+it('lists the published posts of a tag by its slug', function () {
+    $tag = Tag::factory()->create([
+        'name' => 'Astuce',
+        'slug' => 'astuce',
+    ]);
+
+    $published = Post::factory()->published()->create([
+        'title' => 'Astuce publiee',
+    ]);
+
+    $draft = Post::factory()->create([
+        'title' => 'Astuce en brouillon',
+    ]);
+
+    $published->tags()->attach($tag);
+    $draft->tags()->attach($tag);
+
+    Post::factory()->published()->create(['title' => 'Sans ce tag']);
+
+    $this->get('/posts/tag/astuce')
+        ->assertOk()
+        ->assertSee('Astuce publiee')
+        ->assertDontSee('Astuce en brouillon')
+        ->assertDontSee('Sans ce tag');
+});
+
+it('returns 404 for an unknown tag slug', function () {
+    $this->get('/posts/tag/inconnu')->assertNotFound();
+});
+
+it('shows only the tags that have published posts on the home page', function () {
+    $popular = Tag::factory()->create(['name' => 'Populaire']);
+    $hidden = Tag::factory()->create(['name' => 'Invisible']);
+
+    Post::factory(2)->published()->create()->each(
+        fn (Post $post) => $post->tags()->attach($popular)
+    );
+
+    Post::factory()->create()->tags()->attach($hidden);
+
+    $this->get(route('home'))
+        ->assertOk()
+        ->assertSee('Populaire (2)')
+        ->assertDontSee('Invisible');
 });

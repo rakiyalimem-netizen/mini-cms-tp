@@ -17,7 +17,9 @@ class PostController extends Controller
     {
         return view('posts.index', [
             'heading' => 'Tous les articles',
-            'posts' => Post::with('user', 'category', 'tags')->latest('id')->paginate(4),
+            'posts' => Post::with('user', 'category', 'tags')
+                ->latest('id')
+                ->paginate(4),
         ]);
     }
 
@@ -25,7 +27,11 @@ class PostController extends Controller
     {
         return view('posts.index', [
             'heading' => 'Articles de '.$year,
-            'posts' => Post::published()->with('user', 'category', 'tags')->whereYear('published_at', $year)->latest('id')->paginate(4),
+            'posts' => Post::published()
+                ->with('user', 'category', 'tags')
+                ->whereYear('published_at', $year)
+                ->latest('id')
+                ->paginate(4),
         ]);
     }
 
@@ -34,6 +40,19 @@ class PostController extends Controller
         return view('posts.index', [
             'heading' => 'Catégorie : '.$category->name,
             'posts' => $category->posts()
+                ->published()
+                ->with('user', 'category', 'tags')
+                ->latest('published_at')
+                ->paginate(4),
+        ]);
+    }
+
+    // Afficher les articles d'un tag
+    public function byTag(Tag $tag): View
+    {
+        return view('posts.index', [
+            'heading' => 'Tag : '.$tag->name,
+            'posts' => $tag->posts()
                 ->published()
                 ->with('user', 'category', 'tags')
                 ->latest('published_at')
@@ -113,7 +132,9 @@ class PostController extends Controller
         ]);
 
         $validated['is_published'] = $request->boolean('is_published');
-        $validated['published_at'] = $validated['is_published'] ? ($post->published_at ?? now()) : null;
+        $validated['published_at'] = $validated['is_published']
+            ? ($post->published_at ?? now())
+            : null;
 
         $post->update(Arr::except($validated, ['tags']));
         $post->tags()->sync($validated['tags'] ?? []);
