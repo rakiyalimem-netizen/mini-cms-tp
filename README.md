@@ -21,6 +21,8 @@
 | Tests | à compléter | à compléter |
 | GET | `/api/posts` | `api.posts.index` | `Api\PostController@index` |
 | GET | `/api/posts/{post}` | `api.posts.show` | `Api\PostController@show` |
+| GET | `/api/posts` | `api.posts.index` | `Api\PostController@index` |
+| GET | `/api/posts/{post}` | `api.posts.show` | `Api\PostController@show` |
 
 Ce que je garderais du kit dans un vrai projet : à compléter (deux phrases).
 ### Session 12
