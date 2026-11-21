@@ -1,50 +1,176 @@
-## État actuel (tag lab-08)
+# Mini-CMS
 
-- `GET /api/categories` et `GET /api/categories/{category}`, avec le nombre d'articles publiés de chaque catégorie.
-- `GET /api/posts?category=<slug>&tag=<slug>` : filtres par catégorie et par tag, comparaison exacte, slug inconnu refusé (422).
-- `POST /api/login` renvoie un jeton Sanctum ; `POST /api/logout` le révoque.
-- `POST`, `PUT/PATCH` et `DELETE /api/posts` protégés par `auth:sanctum`, avec les mêmes Form Requests et la même `PostPolicy` que le site (401, 403 et 422 en JSON).
-- Tests Pest `ApiReadTest` et `ApiWriteTest`.
-## Comparaison avec le starter kit Livewire
+## Description
 
-| Critère | Mini-CMS (authentification manuelle) | Starter kit Livewire |
+Mini-CMS est une application web de gestion de contenu développée avec Laravel 13 dans le cadre de l'atelier Framework Côté Serveur à l'ISET Sidi Bouzid.
+
+L'application permet de gérer des articles, des catégories et des tags. Elle propose également un système d'authentification avec deux rôles : administrateur et auteur, ainsi qu'une API REST pour accéder aux données.
+
+**Environnement technique :**
+- Laravel 13.43.0
+- PHP 8.5.11
+- SQLite
+- Laravel Sanctum
+- Pest pour les tests
+- Node.js v22.20.0
+- npm 11.6.2
+
+## Fonctionnalités
+
+- Affichage de la page d'accueil et des articles.
+- Consultation des détails d'un article.
+- Création, modification et suppression des articles.
+- Gestion des catégories et des tags.
+- Association des articles aux catégories et aux tags.
+- Authentification des utilisateurs.
+- Gestion des rôles administrateur et auteur.
+- Autorisation des opérations avec PostPolicy.
+- Validation des formulaires avec les Form Requests.
+- Messages flash après les opérations.
+- Pagination et filtrage des articles.
+- API REST pour les articles, catégories et tags.
+- Authentification API avec Laravel Sanctum.
+- Tests automatisés avec Pest.
+
+## Installation
+
+### Bash
+
+```bash
+git clone https://github.com/rakiyalimem-netizen/mini-cms-tp.git
+cd mini-cms-tp
+
+composer install
+
+cp .env.example .env
+
+touch database/database.sqlite
+
+php artisan key:generate
+
+php artisan migrate --seed
+
+npm install
+
+npm run build
+
+php artisan serve
+```
+
+L'application sera accessible à l'adresse :
+
+http://127.0.0.1:8000
+
+### PowerShell
+
+```powershell
+git clone https://github.com/rakiyalimem-netizen/mini-cms-tp.git
+cd mini-cms-tp
+
+composer install
+
+Copy-Item .env.example .env
+
+New-Item database/database.sqlite -ItemType File -Force
+
+php artisan key:generate
+
+php artisan migrate --seed
+
+npm install
+
+npm run build
+
+php artisan serve
+```
+
+L'application sera accessible à l'adresse :
+
+http://127.0.0.1:8000
+
+**Remarque :** Le projet utilise SQLite. Le fichier `database/database.sqlite` contient la base de données locale.
+
+## Comptes de test
+
+Les comptes suivants sont présents dans la base de données de développement.
+
+| Rôle | Adresse e-mail | Mot de passe |
 |---|---|---|
-| Routes d'authentification | à compléter | à compléter |
-| Inscription | à compléter | à compléter |
-| Connexion | à compléter | à compléter |
-| Déconnexion | à compléter | à compléter |
-| Limitation des tentatives | à compléter | à compléter |
-| Mot de passe oublié | à compléter | à compléter |
-| Vérification de l'e-mail | à compléter | à compléter |
-| Double authentification | à compléter | à compléter |
-| Rôles et autorisations | à compléter | à compléter |
-| Tests | à compléter | à compléter |
-| GET | `/api/posts` | `api.posts.index` | `Api\PostController@index` |
-| GET | `/api/posts/{post}` | `api.posts.show` | `Api\PostController@show` |
-| GET | `/api/posts` | `api.posts.index` | `Api\PostController@index` |
-| GET | `/api/posts/{post}` | `api.posts.show` | `Api\PostController@show` |
-| GET | `/api/categories` | `api.categories.index` | `Api\CategoryController@index` |
-| GET | `/api/categories/{category}` | `api.categories.show` | `Api\CategoryController@show` |
-| POST | `/api/login` | `api.login` | `Api\AuthController@login` |
-| POST | `/api/logout` | `api.logout` | `Api\AuthController@logout` |
-| POST | `/api/posts` | `api.posts.store` | `Api\PostController@store` |
-| PUT/PATCH | `/api/posts/{post}` | `api.posts.update` | `Api\PostController@update` |
-| DELETE | `/api/posts/{post}` | `api.posts.destroy` | `Api\PostController@destroy` |
+| Administrateur | test@example.com | password |
+| Auteur | clemens.thompson@example.net | password |
+| Auteur | ledner.shirley@example.org | password |
+| Auteur | auteur-b@example.com | password |
 
-Ce que je garderais du kit dans un vrai projet : à compléter (deux phrases).
-### Session 12
+Ces comptes sont destinés uniquement aux tests locaux.
 
-![Page 403 « Réservé aux administrateurs. » pour un compte auteur sur /admin/tags](screenshots/s12-admin-interdit.png)
+## API
 
-![Barre de navigation d'un compte auteur, sans les liens Catégories et Tags](screenshots/s12-menu-auteur.png)
-### Session 13
+L'API REST est accessible avec le préfixe :
 
-![Postman : réponse JSON de GET /api/posts?per_page=2, avec data, links et meta](screenshots/s13-postman-liste.png)
+`http://127.0.0.1:8000/api`
 
-![Postman : réponse 422 de GET /api/posts?per_page=500, avec le message en français](screenshots/s13-postman-422.png)
+### Endpoints
 
-### Session 14
+| Méthode | Endpoint | Description | Accès |
+|---|---|---|---|
+| GET | `/api/posts` | Liste des articles publiés | Public |
+| GET | `/api/posts/{post}` | Détails d'un article | Public |
+| POST | `/api/posts` | Créer un article | Authentifié |
+| PUT/PATCH | `/api/posts/{post}` | Modifier un article | Authentifié et autorisé |
+| DELETE | `/api/posts/{post}` | Supprimer un article | Authentifié et autorisé |
+| GET | `/api/categories` | Liste des catégories | Public |
+| GET | `/api/categories/{category}` | Détails d'une catégorie | Public |
+| GET | `/api/tags` | Liste des tags | Public |
+| GET | `/api/tags/{tag}` | Détails d'un tag | Public |
+| POST | `/api/login` | Connexion et génération d'un jeton | Public |
+| POST | `/api/logout` | Déconnexion et révocation du jeton courant | Authentifié |
+| GET | `/api/user` | Informations de l'utilisateur connecté | Authentifié |
 
-![Postman : POST /api/posts avec un jeton Bearer, onglet Body, réponse 201 Created](screenshots/s14-postman-201.png)
+Le filtrage et la pagination des articles sont également disponibles :
 
-![Postman : PUT sur l'article d'un autre auteur, réponse 403](screenshots/s14-postman-403.png)
+- `GET /api/posts?per_page=5`
+- `GET /api/posts?category=slug-categorie`
+- `GET /api/posts?tag=slug-tag`
+
+### Authentification par jeton
+
+L'API utilise Laravel Sanctum pour l'authentification par jeton Bearer.
+
+**1. Connexion**
+
+Envoyer une requête POST vers :
+
+`http://127.0.0.1:8000/api/login`
+
+Corps JSON :
+
+```json
+{
+    "email": "test@example.com",
+    "password": "password"
+}
+```
+
+La réponse contient un jeton d'accès :
+
+```json
+{
+    "token": "VOTRE_JETON",
+    "token_type": "Bearer"
+}
+```
+
+**2. Utilisation du jeton**
+
+Pour accéder aux routes protégées, ajouter cet en-tête HTTP :
+
+```http
+Authorization: Bearer VOTRE_JETON
+Accept: application/json
+```
+
+**3. Déconnexion**
+
+Envoyer une requête POST vers :
+
+`http://127.
